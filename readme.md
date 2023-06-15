@@ -1,16 +1,16 @@
-# Phonecontacts Backend
+# Blog Backend
 
 
 ## Table of contents
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Setup](#setup)
-* [Project Links](#project-links)
-* [Features](#features)
+<!-- * [Project Links](#project-links) -->
+<!-- * [Features](#features) -->
 * [Project Status](#project-status)
 
 ## General info
-Phonecontacs list backend with persons name and number. 
+Blog - Users can store details about each blog, including the author, title, URL, and the number of votes given by users of the blog list application.
 
 ## Technologies
 Project is created with:
@@ -25,7 +25,7 @@ npm i
 npm run dev
 ```
 
-## Project Links
+<!-- ## Project Links -->
 
 
 
