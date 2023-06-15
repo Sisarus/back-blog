@@ -44,4 +44,7 @@ npm install eslint --save-dev
 npx eslint --init
 npm run lint -- --fix
 
+
+
+npm test -- -t 'when list has only one blog, equals the likes of that'
 -->
