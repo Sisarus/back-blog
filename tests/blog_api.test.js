@@ -56,7 +56,6 @@ test('Can add new blog', async () => {
 
 })
 
-
 test('If blog has no likes, zero should start value', async () => {
   const newBlog = {
     title: 'Type wars',
@@ -75,6 +74,32 @@ test('If blog has no likes, zero should start value', async () => {
   const blog = blogsAtEnd[blogsAtEnd.length - 1]
 
   expect(blog.likes).toBe(0)
+})
+
+test('Bad request if no title', async () => {
+  const newBlog = {
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+    likes: 10
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('Bad request if no url', async () => {
+  const newBlog = {
+    title: 'Type wars',
+    author: 'Robert C. Martin',
+    likes: 10
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
 
 afterAll(async () => {
