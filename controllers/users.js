@@ -3,7 +3,12 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.post('/', async (request, response) => {
+
+  if (request.body.password === undefined) {
+    return response.status(400).json({ error: 'Content is missing' })
+  }
   const { username, name, password } = request.body
+
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
