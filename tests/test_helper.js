@@ -2,6 +2,7 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const saltRounds = 10
 
@@ -69,6 +70,19 @@ const createKanaUser = async () => {
   return savedUser
 }
 
+const createUserToken = async () => {
+  const savedUser = await User.findOne({ name: 'kana' })
+
+  const userForToken = {
+    username: savedUser.username,
+    id: savedUser._id,
+  }
+
+  const token = jwt.sign(userForToken, process.env.SECRET)
+
+  return token
+}
+
 module.exports = {
-  initialBlogs, nonExistingId, blogsInDb, initialUsers, usersInDb, createKanaUser
+  initialBlogs, nonExistingId, blogsInDb, initialUsers, usersInDb, createKanaUser,createUserToken
 }

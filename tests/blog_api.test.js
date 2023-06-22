@@ -118,6 +118,8 @@ describe('when there is initially some blogs saved', () => {
     })
 
     test('Bad request if no title', async () => {
+      const token = await helper.createUserToken()
+
       const newBlog = {
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
@@ -126,26 +128,12 @@ describe('when there is initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
     })
 
     test('Bad request if no url', async () => {
-      const newBlog = {
-        title: 'Type wars',
-        author: 'Robert C. Martin',
-        likes: 10
-      }
-
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-    })
-  })
-
-  describe('DELETE one blog', () => {
-    test('succeeds with status code 204 if id is valid', async () => {
       const savedUser = await User.findOne({ name: 'kana' })
 
       const userForToken = {
@@ -155,10 +143,27 @@ describe('when there is initially some blogs saved', () => {
 
       const token = jwt.sign(userForToken, process.env.SECRET)
 
+
+      const newBlog = {
+        title: 'Type wars',
+        author: 'Robert C. Martin',
+        likes: 10
+      }
+
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog)
+        .expect(400)
+    })
+  })
+
+  describe('DELETE one blog', () => {
+    test('succeeds with status code 204 if id is valid', async () => {
+      const token = await helper.createUserToken()
+
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart [0]
-
-      console.log(blogToDelete.id)
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
@@ -179,6 +184,8 @@ describe('when there is initially some blogs saved', () => {
 
   describe('PUT new data one blog', () => {
     test('succeeds with status code 204 if id is valid', async () => {
+      const token = await helper.createUserToken()
+
       const blogsStart = await helper.blogsInDb()
       const blogToUpdate = blogsStart[0]
 
@@ -186,6 +193,7 @@ describe('when there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(blogToUpdate)
         .expect(202)
 

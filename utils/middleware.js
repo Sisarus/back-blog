@@ -1,5 +1,6 @@
 const logger = require('./logger')
-const mongoose = require('mongoose')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -20,8 +21,6 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
-  } else if (error instanceof mongoose.Error.ValidationError) {
-    response.status(400).json({ error: error.message })
   }
 
   next(error)
@@ -34,6 +33,22 @@ const tokenExtractor = (request, response, next) => {
     const token = authorization.replace('Bearer ', '')
     request.token = token
   }
+  next()
+}
+
+const userExtractor = async (request, response, next) => {
+  if(request.method === 'GET') {
+    return next()
+  }
+
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  const user = await User.findById(decodedToken.id)
+
+  if(!user) {
+    return response.status(401).send({ error: 'No token' })
+  }
+
+  request.user = user
 
   next()
 }
@@ -42,5 +57,6 @@ module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
-  tokenExtractor
+  tokenExtractor,
+  userExtractor
 }
