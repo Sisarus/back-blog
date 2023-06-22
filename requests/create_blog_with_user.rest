@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Neuleita",
+  "author": "Nana",
+  "url": "http://a-nanan.blogspot.com/",
+  "likes": 2,
+  "user": "6492f1ffbcddb33afa0bd72a"
+}
