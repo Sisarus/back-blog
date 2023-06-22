@@ -13,8 +13,6 @@ beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
-
-
 })
 
 describe('when there is initially some blogs saved', () => {
