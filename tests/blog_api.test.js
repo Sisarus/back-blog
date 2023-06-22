@@ -12,7 +12,19 @@ const helper = require('./test_helper')
 beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
-  await Blog.insertMany(helper.initialBlogs)
+
+  const savedUser = await helper.createKanaUser()
+
+  for (const blog of helper.initialBlogs) {
+    const newBlog = new Blog({
+      title: blog.title,
+      aurhor: blog.author,
+      url: blog.url,
+      likes: blog.likes,
+      user: savedUser._id
+    })
+    await newBlog.save()
+  }
 })
 
 describe('when there is initially some blogs saved', () => {
@@ -38,7 +50,7 @@ describe('when there is initially some blogs saved', () => {
 
   describe('POST adding new blogs', () => {
     test('Can add new blog', async () => {
-      const savedUser = await helper.createKanaUser()
+      const savedUser = await User.findOne({ name: 'kana' })
 
       const userForToken = {
         username: savedUser.username,
@@ -75,7 +87,7 @@ describe('when there is initially some blogs saved', () => {
 
   describe('POST adding blogs with no-data', () => {
     test('If blog has no likes, zero should start value', async () => {
-      const savedUser = await helper.createKanaUser()
+      const savedUser = await User.findOne({ name: 'kana' })
 
       const userForToken = {
         username: savedUser.username,
@@ -134,11 +146,23 @@ describe('when there is initially some blogs saved', () => {
 
   describe('DELETE one blog', () => {
     test('succeeds with status code 204 if id is valid', async () => {
+      const savedUser = await User.findOne({ name: 'kana' })
+
+      const userForToken = {
+        username: savedUser.username,
+        id: savedUser._id,
+      }
+
+      const token = jwt.sign(userForToken, process.env.SECRET)
+
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart [0]
 
+      console.log(blogToDelete.id)
+
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
