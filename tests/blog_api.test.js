@@ -1,15 +1,20 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
+
+
 })
 
 describe('when there is initially some blogs saved', () => {
@@ -35,15 +40,26 @@ describe('when there is initially some blogs saved', () => {
 
   describe('POST adding new blogs', () => {
     test('Can add new blog', async () => {
+      const savedUser = await helper.createKanaUser()
+
+      const userForToken = {
+        username: savedUser.username,
+        id: savedUser._id,
+      }
+
+      const token = jwt.sign(userForToken, process.env.SECRET)
+
       const newBlog = {
         title: 'First class tests',
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
-        likes: 10
+        likes: 10,
+        user: savedUser._id
       }
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -61,14 +77,25 @@ describe('when there is initially some blogs saved', () => {
 
   describe('POST adding blogs with no-data', () => {
     test('If blog has no likes, zero should start value', async () => {
+      const savedUser = await helper.createKanaUser()
+
+      const userForToken = {
+        username: savedUser.username,
+        id: savedUser._id,
+      }
+
+      const token = jwt.sign(userForToken, process.env.SECRET)
+
       const newBlog = {
         title: 'Type wars',
         author: 'Robert C. Martini',
-        url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html'
+        url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
+        user: savedUser._id
       }
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)

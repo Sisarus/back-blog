@@ -1,4 +1,5 @@
 const logger = require('./logger')
+const mongoose = require('mongoose')
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -19,6 +20,8 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
+  } else if (error instanceof mongoose.Error.ValidationError) {
+    response.status(400).json({ error: error.message })
   }
 
   next(error)

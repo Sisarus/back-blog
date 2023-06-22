@@ -1,6 +1,10 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+const bcrypt = require('bcrypt')
+
+const saltRounds = 10
+
 const initialBlogs = [
   {
     title: 'React patterns',
@@ -51,6 +55,20 @@ const usersInDb = async () => {
   return users.map(user => user.toJSON())
 }
 
+const createKanaUser = async () => {
+  const passwordHash = await bcrypt.hash('kana', saltRounds)
+
+  const newUser = new User({
+    username: 'kana',
+    name: 'kana',
+    passwordHash: passwordHash
+  })
+
+  const savedUser = await newUser.save()
+
+  return savedUser
+}
+
 module.exports = {
-  initialBlogs, nonExistingId, blogsInDb, initialUsers, usersInDb
+  initialBlogs, nonExistingId, blogsInDb, initialUsers, usersInDb, createKanaUser
 }
