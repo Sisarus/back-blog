@@ -156,6 +156,22 @@ describe('when there is initially some blogs saved', () => {
         .send(newBlog)
         .expect(400)
     })
+    test('Cant add new blog if no-token', async () => {
+      const savedUser = await User.findOne({ name: 'kana' })
+
+      const newBlog = {
+        title: 'First class tests',
+        author: 'Robert C. Martin',
+        url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+        likes: 10,
+        user: savedUser._id
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+    })
   })
 
   describe('DELETE one blog', () => {
