@@ -41,6 +41,8 @@ const userExtractor = async (request, response, next) => {
     return next()
   }
 
+  console.log('request.token' , request.token)
+
   if(!request.token) {
     return response.status(401).send({ error: 'No token' })
   }
